@@ -1,15 +1,30 @@
+use crate::components::multi_select_list::{DefaultSelection, MultiSelectList};
+use ratatui::text::Line;
+
 /// Application.
 #[derive(Debug, Default)]
-pub struct App {
+pub struct App<'a> {
     pub should_quit: bool,
-    /// counter
-    pub counter: u8,
+    pub item: MultiSelectList<'a>,
 }
 
-impl App {
+impl<'a> App<'a> {
     /// Constructs a new instance of [`App`].
     pub fn new() -> Self {
-        Self::default()
+        App {
+            should_quit: false,
+            item: MultiSelectList::new(
+                [
+                    Line::from(vec!["Fork tui-rs 💻".into()]),
+                    Line::from(vec!["Create a website & book 🕮".into()]),
+                    Line::from(vec!["Celebrate 500th commit ⭐".into()]),
+                    Line::from(vec!["Celebrate 1000th commit ✨".into()]),
+                    Line::from(vec!["Release Ratatui 1.0.0 🎉".into()]),
+                ]
+                .into(),
+                DefaultSelection::Full,
+            ),
+        }
     }
 
     /// Handles the tick event of the terminal.
@@ -18,35 +33,5 @@ impl App {
     /// Set should_quit to true to quit the application.
     pub fn quit(&mut self) {
         self.should_quit = true;
-    }
-
-    pub fn increment_counter(&mut self) {
-        if let Some(res) = self.counter.checked_add(1) {
-            self.counter = res;
-        }
-    }
-
-    pub fn decrement_counter(&mut self) {
-        if let Some(res) = self.counter.checked_sub(1) {
-            self.counter = res;
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_app_increment_counter() {
-        let mut app = App::default();
-        app.increment_counter();
-        assert_eq!(app.counter, 1);
-    }
-
-    #[test]
-    fn test_app_decrement_counter() {
-        let mut app = App::default();
-        app.decrement_counter();
-        assert_eq!(app.counter, 0);
     }
 }

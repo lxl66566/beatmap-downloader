@@ -10,22 +10,29 @@ pub mod ui;
 /// Terminal user interface.
 pub mod tui;
 
-pub mod components;
 /// Application updater.
 pub mod update;
-use anyhow::Result;
-use app::App;
 
+pub mod components;
+mod util;
+
+use anyhow::Result;
+
+use app::App;
+use current_locale::current_locale;
 use event::{Event, EventHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};
+use rust_i18n::set_locale;
 use tui::Tui;
 use update::update;
+use util::calculate_api_number;
 
 #[macro_use]
 extern crate rust_i18n;
-
+rust_i18n::i18n!("locales", fallback = "zh-CN");
 fn main() -> Result<()> {
-    i18n!("locales", fallback = "zh-CN");
+    set_locale(current_locale().unwrap_or("zh-CN".to_owned()).as_str());
+
     // Create an application.
     let mut app = App::new();
 
@@ -37,7 +44,7 @@ fn main() -> Result<()> {
     tui.enter()?;
 
     // Start the main loop.
-    while !app.should_quit {
+    while !app.force_quit && app.layer > 0 {
         // Render the user interface.
         tui.draw(&mut app)?;
         // Handle events.

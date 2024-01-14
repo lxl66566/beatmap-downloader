@@ -2,6 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction},
     prelude::{Alignment, Frame, Layout},
     style::{Color, Modifier, Style},
+    text::Line,
     widgets::{Block, BorderType, Borders, HighlightSpacing, List, ListState, Paragraph},
 };
 
@@ -41,4 +42,22 @@ pub fn render(app: &mut App, f: &mut Frame) {
     state.select(Some(app.item.cursor()));
     // Render the list
     f.render_stateful_widget(styled_list, layout[1], &mut state)
+}
+
+pub fn help_render(app: &mut App, f: &mut Frame) {
+    let help_message = vec![];
+
+    f.render_widget(
+        Paragraph::new(Line::from(help_message))
+            .block(
+                Block::default()
+                    .title(t!("help"))
+                    .title_alignment(Alignment::Center)
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded),
+            )
+            .style(Style::default().fg(Color::Yellow))
+            .alignment(Alignment::Center),
+        f.size(),
+    );
 }

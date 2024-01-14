@@ -4,7 +4,9 @@ use ratatui::text::Line;
 /// Application.
 #[derive(Debug, Default)]
 pub struct App<'a> {
-    pub should_quit: bool,
+    /// Layer of the app. If `layer` = 0, app would quit.
+    pub layer: u8,
+    pub force_quit: bool,
     pub item: MultiSelectList<'a>,
 }
 
@@ -12,7 +14,8 @@ impl<'a> App<'a> {
     /// Constructs a new instance of [`App`].
     pub fn new() -> Self {
         App {
-            should_quit: false,
+            layer: 1,
+            force_quit: false,
             item: MultiSelectList::new(
                 [
                     Line::from(vec!["Fork tui-rs 💻".into()]),
@@ -30,8 +33,13 @@ impl<'a> App<'a> {
     /// Handles the tick event of the terminal.
     pub fn tick(&self) {}
 
-    /// Set should_quit to true to quit the application.
-    pub fn quit(&mut self) {
-        self.should_quit = true;
+    /// Go back to previous layer.
+    pub fn go_back(&mut self) {
+        self.layer = self.layer.saturating_sub(1);
+    }
+
+    /// Force to quit the program.
+    pub fn force_quit(&mut self) {
+        self.force_quit = true;
     }
 }

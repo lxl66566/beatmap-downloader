@@ -1,8 +1,10 @@
-use crate::{
-    components::multi_select_list::{DefaultSelection, MultiSelectList},
-    components::select_list::SelectList,
+use crate::components::{
+    multi_select_list::{DefaultSelection, MultiSelectList},
+    select_list::SelectList,
 };
-use ratatui::text::Line;
+use ratatui::{text::Line, widgets::Block};
+use time::{Date, OffsetDateTime};
+use tui_textarea::TextArea;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Page {
@@ -14,7 +16,7 @@ pub enum Page {
 const SESSION_MAX: usize = 4;
 
 /// Application.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App<'a> {
     /// Layer of the app. If `layer` = 0, app would quit.
     pub layer: u8,
@@ -22,14 +24,16 @@ pub struct App<'a> {
     /// beatmap type: after a day / hotest / newest / search
     pub mode: SelectList<'a>,
     pub item: MultiSelectList<'a>,
+    pub date: Date,
     pub page: Page,
-    /// Paragraph of the current page.
+    /// Paragraph (Block) of the current page.
     pub session: usize,
+    /// text in mini editor
+    pub text: TextArea<'a>,
 }
 
-impl<'a> App<'a> {
-    /// Constructs a new instance of [`App`].
-    pub fn new() -> Self {
+impl<'a> Default for App<'a> {
+    fn default() -> Self {
         App {
             layer: 1,
             force_quit: false,
@@ -54,9 +58,18 @@ impl<'a> App<'a> {
                 .map(Line::raw),
                 DefaultSelection::Full,
             ),
-            page: Page::default(),
+            date: OffsetDateTime::now_utc().date(),
             session: 0,
+            page: Page::default(),
+            text: TextArea::default(),
         }
+    }
+}
+
+impl<'a> App<'a> {
+    /// Constructs a new instance of [`App`].
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Handles the tick event of the terminal.
@@ -94,9 +107,11 @@ impl<'a> App<'a> {
 
     pub fn next_session(&mut self) {
         self.session = (self.session + 1) % SESSION_MAX;
+        assert!(self.session < SESSION_MAX)
     }
 
     pub fn prev_session(&mut self) {
         self.session = (self.session as isize - 1).rem_euclid(SESSION_MAX as isize) as usize;
+        assert!(self.session < SESSION_MAX)
     }
 }

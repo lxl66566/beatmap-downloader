@@ -19,14 +19,12 @@ mod util;
 use anyhow::Result;
 
 use app::App;
-use components::*;
 use current_locale::current_locale;
 use event::{Event, EventHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use rust_i18n::set_locale;
 use tui::Tui;
 use update::update;
-use util::calculate_api_number;
 
 #[macro_use]
 extern crate rust_i18n;

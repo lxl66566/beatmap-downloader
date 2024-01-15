@@ -49,3 +49,9 @@ zh-CN = "ctb"
 
 [gamemode.mania]
 zh-CN = "mania"
+
+[calendar]
+zh-CN = "从此日期开始；按住 Shift 加速"
+
+[input.num]
+zh-CN = "请输入要下载的谱面数量"

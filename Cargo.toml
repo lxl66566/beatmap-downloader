@@ -16,7 +16,7 @@ ratatui = { version = "0.25.0", features = ["widget-calendar"] }
 reqwest = { version = "0.11.23", features = ["json"] }
 rust-i18n = "2.3.0"
 serde_json = "1.0.111"
-time = { version = "0.3.11", optional = true, features = ["local-offset"] }
+time = { version = "0.3.11", features = ["std"] }
 tokio = { version = "1.35.1", features = ["full"] }
 tui-textarea = "0.4.0"
 

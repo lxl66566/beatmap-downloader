@@ -1,12 +1,13 @@
-use std::borrow::BorrowMut;
+use std::{borrow::BorrowMut, collections::HashMap};
 
 use ratatui::{
     layout::{Constraint, Direction},
     prelude::{Alignment, Frame, Layout},
-    style::{Color, Modifier, Style},
+    style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
-        calendar::Monthly, Block, BorderType, Borders, HighlightSpacing, List, ListState, Paragraph,
+        calendar::{CalendarEventStore, Monthly},
+        Block, BorderType, Borders, HighlightSpacing, List, ListState, Paragraph, Widget,
     },
 };
 
@@ -66,11 +67,37 @@ pub fn render_main(app: &mut App, f: &mut Frame) {
             .with_selected(Some(app.mode.cursor))
             .borrow_mut(),
     );
+
     // session 1: special session
-    match app.session {
-        // after date
-        0 => {}
-        1 => {}
+    match app.mode.cursor {
+        // calendar
+        0 => {
+            let store =
+                CalendarEventStore(HashMap::from([(app.date, Style::default().red().bold())]));
+            Monthly::new(app.date, store)
+                .show_surrounding(Style::default().white())
+                .show_month_header(Style::default().bold())
+                .block(
+                    Block::default()
+                        .title(t!("calendar"))
+                        .title_alignment(Alignment::Center)
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                        .style(Style::default().fg(session_color(1))),
+                )
+                .render(layouts[0][1], f.buffer_mut());
+        }
+        1 | 2 => {
+            app.text.set_block(
+                Block::default()
+                    .title(t!("input.num"))
+                    .title_alignment(Alignment::Center)
+                    .borders(Borders::ALL)
+                    .fg(session_color(1))
+                    .border_type(BorderType::Rounded),
+            );
+            f.render_widget(app.text.widget(), layouts[0][1]);
+        }
         _ => {}
     }
 
@@ -103,7 +130,7 @@ pub fn render_help(_: &mut App, f: &mut Frame) {
         updown = "↑↓",
         leftright = "←→",
         accept = "Enter",
-        quit = "q"
+        quit = "ESC"
     ));
     help_message.extend(vec![Line::from(vec![
         Span::styled(t!("help.select"), Style::default().fg(Color::Green)),

@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 pub fn calculate_api_number(s: &BTreeSet<usize>) -> usize {
-    s.iter().fold(0, |acc, x| acc + (1 << x - 1))
+    s.iter().fold(0, |acc, x| acc + (1 << (x - 1)))
 }
 
 #[cfg(test)]

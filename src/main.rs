@@ -19,6 +19,7 @@ mod util;
 use anyhow::Result;
 
 use app::App;
+use components::*;
 use current_locale::current_locale;
 use event::{Event, EventHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};

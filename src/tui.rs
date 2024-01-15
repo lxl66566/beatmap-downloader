@@ -1,10 +1,10 @@
-use std::{io, panic};
-
+use crate::app::Page;
 use anyhow::Result;
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use std::{io, panic};
 
 pub type CrosstermTerminal = ratatui::Terminal<ratatui::backend::CrosstermBackend<std::io::Stderr>>;
 
@@ -52,7 +52,10 @@ impl Tui {
     /// [`Draw`]: tui::Terminal::draw
     /// [`rendering`]: crate::ui:render
     pub fn draw(&mut self, app: &mut App) -> Result<()> {
-        self.terminal.draw(|frame| ui::help_render(app, frame))?;
+        self.terminal.draw(|frame| match app.current_page() {
+            Page::Main => ui::render_main(app, frame),
+            Page::Help => ui::render_help(app, frame),
+        })?;
         Ok(())
     }
 

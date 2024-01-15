@@ -21,9 +21,13 @@ pub struct MultiSelectList<'a> {
 }
 
 impl<'a> MultiSelectList<'a> {
-    pub fn new(list: Vec<Line<'a>>, default: DefaultSelection) -> Self {
+    pub fn new<T>(list: T, default: DefaultSelection) -> Self
+    where
+        T: IntoIterator,
+        T::Item: Into<Line<'a>>,
+    {
         let mut temp = Self {
-            list: list.clone(),
+            list: list.into_iter().map(|i| i.into()).collect(),
             cursor: 0,
             selected: BTreeSet::new(),
             selected_color: Style::default().green(),

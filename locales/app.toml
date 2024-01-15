@@ -1,5 +1,51 @@
 _version = 2
 
+[separate]
+en = ", "
+zh-CN = "，"
+
 [help]
 en = "Help"
 zh-CN = "帮助"
+
+[help.show]
+zh-CN = "按下 %{key} 键显示帮助"
+
+[help.content]
+zh-CN = "使用 %{updown} 键选择条目，%{leftright} 键在字段之间移动\n%{accept} 键选择，%{quit} 键返回。"
+
+[help.select]
+zh-CN = "绿色代表选中"
+
+[help.not_select]
+zh-CN = "白色代表未选中"
+
+[mode]
+zh-CN = "下载模式"
+
+[mode.date]
+zh-CN = "指定日期之后"
+
+[mode.hot]
+zh-CN = "热门"
+
+[mode.new]
+zh-CN = "最新"
+
+[mode.search]
+zh-CN = "搜索"
+
+[gamemode]
+zh-CN = "游戏模式（多选）"
+
+[gamemode.std]
+zh-CN = "std"
+
+[gamemode.taiko]
+zh-CN = "taiko"
+
+[gamemode.ctb]
+zh-CN = "ctb"
+
+[gamemode.mania]
+zh-CN = "mania"

@@ -50,8 +50,17 @@ zh-CN = "ctb"
 [gamemode.mania]
 zh-CN = "mania"
 
+[mapstate]
+zh-CN = "谱面状态（多选）"
+
 [calendar]
 zh-CN = "从此日期开始；按住 Shift 加速"
 
 [input.num]
 zh-CN = "请输入要下载的谱面数量"
+
+[input.name]
+zh-CN = "请输入要搜索的谱面名称"
+
+[error.num]
+zh-CN = "请输入有效的整数"

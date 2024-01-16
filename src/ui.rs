@@ -11,19 +11,10 @@ use ratatui::{
     },
 };
 
-use crate::app::App;
+use crate::app::{App, DEFAULT_BLOCK};
 
 /// Render main widget.
 pub fn render_main(app: &mut App, f: &mut Frame) {
-    // default session color is green
-    let session_color = |session: usize| {
-        if session == app.session {
-            Color::Green
-        } else {
-            Color::White
-        }
-    };
-
     // make a grid layout
     let v_layouts = Layout::default()
         .direction(Direction::Vertical)
@@ -55,12 +46,10 @@ pub fn render_main(app: &mut App, f: &mut Frame) {
                     .fg(Color::Green),
             )
             .block(
-                Block::default()
+                DEFAULT_BLOCK
+                    .clone()
                     .title(t!("mode"))
-                    .title_alignment(Alignment::Center)
-                    .borders(Borders::ALL)
-                    .border_type(BorderType::Rounded)
-                    .style(Style::default().fg(session_color(0))),
+                    .style(Style::default().fg(app.session_color(0))),
             ),
         layouts[0][0],
         ListState::default()
@@ -78,48 +67,52 @@ pub fn render_main(app: &mut App, f: &mut Frame) {
                 .show_surrounding(Style::default().white())
                 .show_month_header(Style::default().bold())
                 .block(
-                    Block::default()
+                    DEFAULT_BLOCK
+                        .clone()
                         .title(t!("calendar"))
-                        .title_alignment(Alignment::Center)
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Rounded)
-                        .style(Style::default().fg(session_color(1))),
+                        .style(Style::default().fg(app.session_color(1))),
                 )
                 .render(layouts[0][1], f.buffer_mut());
         }
         1 | 2 => {
-            app.text.set_block(
-                Block::default()
-                    .title(t!("input.num"))
-                    .title_alignment(Alignment::Center)
-                    .borders(Borders::ALL)
-                    .fg(session_color(1))
-                    .border_type(BorderType::Rounded),
-            );
+            app.text
+                .set_placeholder_style(Style::default().fg(app.session_color(1)));
+            app.text.set_placeholder_text(t!("input.num"));
+            app.validate(1);
             f.render_widget(app.text.widget(), layouts[0][1]);
         }
-        _ => {}
+        3 => {
+            app.text2
+                .set_placeholder_style(Style::default().fg(app.session_color(1)));
+            app.text2.set_placeholder_text(t!("input.name"));
+            app.text2.set_block(
+                DEFAULT_BLOCK
+                    .title(t!("mode.search"))
+                    .style(Style::default().fg(app.session_color(1))),
+            );
+            f.render_widget(app.text2.widget(), layouts[0][1]);
+        }
+        _ => unreachable!("mode numeber exceeded."),
     }
 
     // session 2
-    let styled_list = List::new(app.item.list.clone())
-        .highlight_spacing(HighlightSpacing::Always)
-        .highlight_symbol("> ")
-        .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-        .block(
-            Block::default()
-                .title(t!("gamemode"))
-                .title_alignment(Alignment::Center)
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .style(Style::default().fg(session_color(2))),
-        );
-    f.render_stateful_widget(
-        styled_list,
+    app.item.render(
+        f,
+        DEFAULT_BLOCK
+            .clone()
+            .title(t!("gamemode"))
+            .style(Style::default().fg(app.session_color(2))),
         layouts[1][0],
-        ListState::default()
-            .with_selected(Some(app.item.cursor()))
-            .borrow_mut(),
+    );
+
+    // session 3
+    app.map_state.render(
+        f,
+        DEFAULT_BLOCK
+            .clone()
+            .title(t!("mapstate"))
+            .style(Style::default().fg(app.session_color(3))),
+        layouts[1][1],
     );
 }
 

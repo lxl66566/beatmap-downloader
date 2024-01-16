@@ -130,6 +130,7 @@ name = "beatmap-downloader"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bitflags 2.4.1",
  "clap",
  "crossterm",
  "current_locale",

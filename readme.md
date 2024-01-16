@@ -1,6 +1,7 @@
 # OSU Beatmap Downloader
 
+WIP.
+
 ## TODO
 
 - [ ] bitflags
-- [ ] textarea https://github.com/rhysd/tui-textarea

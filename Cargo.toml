@@ -9,6 +9,7 @@ description = "TUI tool of OSU beatmap downloader"
 
 [dependencies]
 anyhow = "1.0.79"
+bitflags = { version = "2.4.1", optional = true }
 clap = "4.4.16"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 current_locale = "0.1.1"

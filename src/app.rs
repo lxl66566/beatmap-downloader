@@ -2,7 +2,12 @@ use crate::components::{
     multi_select_list::{DefaultSelection, MultiSelectList},
     select_list::SelectList,
 };
-use ratatui::text::Line;
+use ratatui::{
+    layout::Alignment,
+    style::{Color, Style},
+    text::Line,
+    widgets::{Block, BorderType, Borders},
+};
 use time::{Date, OffsetDateTime};
 use tui_textarea::TextArea;
 
@@ -14,6 +19,10 @@ pub enum Page {
 }
 
 const SESSION_MAX: usize = 4;
+pub const DEFAULT_BLOCK: Block<'_> = Block::new()
+    .title_alignment(Alignment::Center)
+    .borders(Borders::ALL)
+    .border_type(BorderType::Rounded);
 
 /// Application.
 #[derive(Debug)]
@@ -24,12 +33,14 @@ pub struct App<'a> {
     /// beatmap type: after a day / hotest / newest / search
     pub mode: SelectList<'a>,
     pub item: MultiSelectList<'a>,
+    pub map_state: MultiSelectList<'a>,
     pub date: Date,
     pub page: Page,
     /// Paragraph (Block) of the current page.
     pub session: usize,
     /// text in mini editor
-    pub text: TextArea<'a>,
+    pub text: TextArea<'a>, // number
+    pub text2: TextArea<'a>, // name
 }
 
 impl<'a> Default for App<'a> {
@@ -62,6 +73,19 @@ impl<'a> Default for App<'a> {
             session: 0,
             page: Page::default(),
             text: TextArea::default(),
+            text2: TextArea::default(),
+            map_state: MultiSelectList::new(
+                [
+                    "Ranked & Approved",
+                    "Qualified",
+                    "Loved",
+                    "Pending & WIP",
+                    "Graveyard",
+                ]
+                .into_iter()
+                .map(Line::raw),
+                DefaultSelection::Partial([0, 1, 2].into()),
+            ),
         }
     }
 }
@@ -113,5 +137,36 @@ impl<'a> App<'a> {
     pub fn prev_session(&mut self) {
         self.session = (self.session as isize - 1).rem_euclid(SESSION_MAX as isize) as usize;
         assert!(self.session < SESSION_MAX)
+    }
+
+    /// validate if the text in self.text is a number
+    pub fn validate(&mut self, session: usize) -> bool {
+        if self.text.lines()[0].parse::<u32>().is_err() {
+            self.text.set_style(Style::default().fg(Color::LightRed));
+            self.text.set_block(
+                DEFAULT_BLOCK
+                    .clone()
+                    .title(t!("error.num"))
+                    .style(Style::default().fg(self.session_color(session))),
+            );
+            false
+        } else {
+            self.text.set_style(Style::default().fg(Color::LightGreen));
+            self.text.set_block(
+                DEFAULT_BLOCK
+                    .clone()
+                    .title("OK")
+                    .style(Style::default().fg(self.session_color(session))),
+            );
+            true
+        }
+    }
+    // default session color is green
+    pub fn session_color(&self, session: usize) -> Color {
+        if self.session == session {
+            Color::Green
+        } else {
+            Color::White
+        }
     }
 }

@@ -1,7 +1,10 @@
 use anyhow::{Ok, Result};
 use ratatui::{
-    style::{Style, Stylize},
+    layout::Rect,
+    style::{Modifier, Style, Stylize},
     text::Line,
+    widgets::{Block, HighlightSpacing, List, ListState},
+    Frame,
 };
 use std::collections::BTreeSet;
 
@@ -10,6 +13,7 @@ pub enum DefaultSelection {
     Empty,
     Full,
     First,
+    Partial(Vec<usize>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
@@ -29,20 +33,24 @@ impl<'a> MultiSelectList<'a> {
         let mut temp = Self {
             list: list.into_iter().map(|i| i.into()).collect(),
             cursor: 0,
-            selected: BTreeSet::new(),
+            selected: Default::default(),
+
             selected_color: Style::default().green(),
         };
-        match default {
-            DefaultSelection::Full => {
-                for i in 0..temp.list.len() {
-                    temp.select(i).unwrap();
-                }
-            }
-            DefaultSelection::First => {
-                temp.select(0).unwrap();
-            }
-            _ => {}
+        temp.selected = match default {
+            DefaultSelection::Full => (0..temp.list.len()).collect(),
+            DefaultSelection::First => BTreeSet::from([0]),
+            DefaultSelection::Empty => BTreeSet::new(),
+            DefaultSelection::Partial(set) => set.into_iter().collect(),
         };
+        // we need to patch style to all lines, including white line.
+        for (i, line) in temp.list.iter_mut().enumerate() {
+            line.patch_style(if temp.selected.contains(&i) {
+                temp.selected_color
+            } else {
+                Style::default().white()
+            })
+        }
         temp
     }
 
@@ -86,7 +94,43 @@ impl<'a> MultiSelectList<'a> {
     pub fn iter(&self) -> impl Iterator<Item = &Line> {
         self.list.iter()
     }
+
+    /// get the bit_sum of the MultiSelectList.
+    pub fn bit_sum(&self) -> u32 {
+        self.selected.iter().fold(0, |acc, x| acc | (1 << x))
+    }
+
+    pub fn render(&mut self, frame: &mut Frame, block: Block, area: Rect) {
+        let styled_list = List::new(self.list.clone())
+            .highlight_spacing(HighlightSpacing::Always)
+            .highlight_symbol("> ")
+            .highlight_style(Style::default().add_modifier(Modifier::BOLD))
+            .block(block);
+        frame.render_stateful_widget(
+            styled_list,
+            area,
+            &mut ListState::default().with_selected(Some(self.cursor)),
+        )
+    }
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+    #[test]
+    fn test_select() {
+        let mut list = MultiSelectList::new(
+            vec!["Alice", "Bob", "Carol", "David"]
+                .into_iter()
+                .map(Line::from),
+            DefaultSelection::First,
+        );
+        assert_eq!(list.cursor(), 0);
+        assert_eq!(list.selected, BTreeSet::from([0]));
+        list.next();
+        assert_eq!(list.cursor(), 1);
+        list.select(2).unwrap();
+        assert_eq!(list.selected, BTreeSet::from([0, 2]));
+        assert_eq!(list.bit_sum(), 0b101);
+    }
+}

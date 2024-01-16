@@ -2,7 +2,7 @@ use crate::components::{
     multi_select_list::{DefaultSelection, MultiSelectList},
     select_list::SelectList,
 };
-use ratatui::{text::Line, widgets::Block};
+use ratatui::text::Line;
 use time::{Date, OffsetDateTime};
 use tui_textarea::TextArea;
 

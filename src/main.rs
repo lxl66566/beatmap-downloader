@@ -14,7 +14,8 @@ pub mod tui;
 pub mod update;
 
 pub mod components;
-mod util;
+
+use std::io;
 
 use anyhow::Result;
 
@@ -29,30 +30,32 @@ use update::update;
 #[macro_use]
 extern crate rust_i18n;
 rust_i18n::i18n!("locales", fallback = "zh-CN");
-fn main() -> Result<()> {
+
+#[tokio::main]
+async fn main() -> Result<()> {
     set_locale(current_locale().unwrap_or("zh-CN".to_owned()).as_str());
 
     // Create an application.
     let mut app = App::new();
 
     // Initialize the terminal user interface.
-    let backend = CrosstermBackend::new(std::io::stderr());
+    let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
     let events = EventHandler::new(250);
     let mut tui = Tui::new(terminal, events);
-    tui.enter()?;
+    tui.init()?;
 
     // Start the main loop.
     while !app.force_quit && app.layer > 0 {
         // Render the user interface.
         tui.draw(&mut app)?;
         // Handle events.
-        match tui.events.next()? {
-            Event::Tick => {}
+        match tui.events.next().await? {
+            Event::Tick => app.tick(),
             Event::Key(key_event) => update(&mut app, key_event),
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
-        };
+        }
     }
 
     // Exit the user interface.

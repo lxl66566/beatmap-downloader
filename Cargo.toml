@@ -10,13 +10,14 @@ description = "TUI tool of OSU beatmap downloader"
 [dependencies]
 anyhow = "1.0.79"
 bitflags = { version = "2.4.1", optional = true }
-clap = "4.4.16"
+clap = { version = "4.4.16", features = ["derive", "wrap_help"] }
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 current_locale = "0.1.1"
 futures = "0.3.30"
 ratatui = { version = "0.25.0", features = ["widget-calendar"] }
 reqwest = { version = "0.11.23", features = ["json"] }
 rust-i18n = "2.3.0"
+serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
 time = { version = "0.3.11", features = ["std"] }
 tokio = { version = "1.35.1", features = ["full"] }

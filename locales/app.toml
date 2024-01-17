@@ -4,6 +4,18 @@ _version = 2
 en = ", "
 zh-CN = "，"
 
+[space]
+zh-CN = "空格"
+
+[cli.limit]
+zh-CN = "请求的谱面数量"
+
+[cli.offset]
+zh-CN = "数据获取起始点"
+
+[cli.type]
+zh-CN = "分类：1 = hot, 2 = new, 3 = packs, 4 = search"
+
 [help]
 en = "Help"
 zh-CN = "帮助"
@@ -12,7 +24,7 @@ zh-CN = "帮助"
 zh-CN = "按下 %{key} 键显示帮助"
 
 [help.content]
-zh-CN = "使用 %{updown} 键选择条目，%{leftright} 键在字段之间移动\n%{accept} 键选择，%{quit} 键返回。"
+zh-CN = "使用 %{updown} 键选择条目，%{leftright} 键在字段之间移动\n%{select} 键选择，%{ok} 键确认\n%{quit} 键返回"
 
 [help.select]
 zh-CN = "绿色代表选中"

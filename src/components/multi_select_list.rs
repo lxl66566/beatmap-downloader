@@ -100,6 +100,7 @@ impl<'a> MultiSelectList<'a> {
         self.selected.iter().fold(0, |acc, x| acc | (1 << x))
     }
 
+    /// render the select list with default style in this project.
     pub fn render(&mut self, frame: &mut Frame, block: Block, area: Rect) {
         let styled_list = List::new(self.list.clone())
             .highlight_spacing(HighlightSpacing::Always)

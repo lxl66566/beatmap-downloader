@@ -1,27 +1,24 @@
-/// Application.
+/// TUI Application.
 pub mod app;
-
-/// Terminal events handler.
 pub mod event;
-
-/// Widget renderer.
-pub mod ui;
-
-/// Terminal user interface.
 pub mod tui;
-
-/// Application updater.
+pub mod ui;
 pub mod update;
 
 pub mod components;
+pub mod core;
+pub mod info;
 
 use std::io;
 
 use anyhow::Result;
 
 use app::App;
+use clap::Parser;
+use core::api::{Cli, Commands};
 use current_locale::current_locale;
 use event::{Event, EventHandler};
+use info::info;
 use ratatui::{backend::CrosstermBackend, Terminal};
 use rust_i18n::set_locale;
 use tui::Tui;
@@ -34,6 +31,14 @@ rust_i18n::i18n!("locales", fallback = "zh-CN");
 #[tokio::main]
 async fn main() -> Result<()> {
     set_locale(current_locale().unwrap_or("zh-CN".to_owned()).as_str());
+
+    let cli = Cli::parse();
+    let api = &match cli.download.as_ref().unwrap() {
+        Commands::Download(api) => api.clone(),
+    }
+    .with_cmd("beatmaplist".to_string());
+    // test
+    return info(api).await;
 
     // Create an application.
     let mut app = App::new();

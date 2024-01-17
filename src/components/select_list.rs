@@ -1,4 +1,10 @@
-use ratatui::text::Line;
+use ratatui::{
+    layout::Rect,
+    style::{Color, Modifier, Style},
+    text::Line,
+    widgets::{Block, HighlightSpacing, List, ListState},
+    Frame,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Default)]
 pub struct SelectList<'a> {
@@ -30,6 +36,25 @@ impl<'a> SelectList<'a> {
 
     pub fn iter(&self) -> impl Iterator<Item = &Line> {
         self.list.iter()
+    }
+
+    /// render the select list with default style in this project.
+    pub fn render(&mut self, frame: &mut Frame, block: Block, area: Rect) {
+        let styled_list = List::new(self.list.clone())
+            .style(Style::default().fg(Color::White))
+            .highlight_spacing(HighlightSpacing::Always)
+            .highlight_symbol("> ")
+            .highlight_style(
+                Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .fg(Color::Green),
+            )
+            .block(block);
+        frame.render_stateful_widget(
+            styled_list,
+            area,
+            &mut ListState::default().with_selected(Some(self.cursor)),
+        )
     }
 }
 

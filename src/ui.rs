@@ -1,13 +1,13 @@
-use std::{borrow::BorrowMut, collections::HashMap};
+use std::collections::HashMap;
 
 use ratatui::{
     layout::{Constraint, Direction},
     prelude::{Alignment, Frame, Layout},
-    style::{Color, Modifier, Style, Stylize},
+    style::{Color, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
         calendar::{CalendarEventStore, Monthly},
-        Block, BorderType, Borders, HighlightSpacing, List, ListState, Paragraph, Widget,
+        Block, BorderType, Borders, Paragraph, Widget,
     },
 };
 
@@ -35,26 +35,13 @@ pub fn render_main(app: &mut App, f: &mut Frame) {
     // render in the layout
 
     // session 0
-    f.render_stateful_widget(
-        List::new(app.mode.list.clone())
-            .style(Style::default().fg(Color::White))
-            .highlight_spacing(HighlightSpacing::Always)
-            .highlight_symbol("> ")
-            .highlight_style(
-                Style::default()
-                    .add_modifier(Modifier::BOLD)
-                    .fg(Color::Green),
-            )
-            .block(
-                DEFAULT_BLOCK
-                    .clone()
-                    .title(t!("mode"))
-                    .style(Style::default().fg(app.session_color(0))),
-            ),
+    app.mode.render(
+        f,
+        DEFAULT_BLOCK
+            .clone()
+            .title(t!("mode"))
+            .style(Style::default().fg(app.session_color(0))),
         layouts[0][0],
-        ListState::default()
-            .with_selected(Some(app.mode.cursor))
-            .borrow_mut(),
     );
 
     // session 1: special session
@@ -122,8 +109,9 @@ pub fn render_help(_: &mut App, f: &mut Frame) {
         "help.content",
         updown = "↑↓",
         leftright = "←→",
-        accept = "Enter",
-        quit = "ESC"
+        select = t!("space"),
+        quit = "ESC",
+        ok = "Enter",
     ));
     help_message.extend(vec![Line::from(vec![
         Span::styled(t!("help.select"), Style::default().fg(Color::Green)),

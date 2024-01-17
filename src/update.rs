@@ -1,7 +1,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use time::Duration;
 
-use crate::app::App;
+use crate::app::{App, Page};
 
 pub fn update(app: &mut App, key_event: KeyEvent) {
     if key_event.modifiers == KeyModifiers::CONTROL
@@ -13,11 +13,14 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
         KeyCode::Esc => app.go_back(),
         KeyCode::Left => app.prev_session(),
         KeyCode::Right => app.next_session(),
-        _ => update_app_session(app, key_event),
+        _ => match app.page {
+            Page::Main => update_main_page(app, key_event),
+            Page::Help => app.help(),
+        },
     };
 }
 
-pub fn update_app_session(app: &mut App, key_event: KeyEvent) {
+pub fn update_main_page(app: &mut App, key_event: KeyEvent) {
     let key = key_event.code;
     match app.session {
         0 => match key {
@@ -44,7 +47,7 @@ pub fn update_app_session(app: &mut App, key_event: KeyEvent) {
             match key {
                 KeyCode::Down => multilist.next(),
                 KeyCode::Up => multilist.prev(),
-                KeyCode::Enter => {
+                KeyCode::Char(' ') => {
                     multilist.select_cursor();
                 }
                 _ => app.help(),

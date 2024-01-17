@@ -1,20 +1,20 @@
 use anyhow::Result;
-use std::collections::HashMap;
-use tokio;
-#[tokio::main]
-async fn main() -> Result<()> {
+
+use crate::core::api::API;
+pub async fn info(api: &API) -> Result<()> {
     let client = reqwest::Client::new();
-    let mut map = HashMap::new();
-    map.insert("cmd", "beatmaplist");
-    map.insert("type", "hot");
-    map.insert("limit", "20");
+    dbg!(&api);
     let res = client
         .post("https://api.sayobot.cn/?post")
-        .json(&map)
+        .json(api)
         .send()
-        .await?
-        .json()
         .await?;
-    println!("{:?}", res);
+
+    if res.status().is_success() {
+        let json_body: serde_json::Value = res.json().await?;
+        println!("{:?}", json_body);
+    } else {
+        println!("Request failed with status code: {:?}", res.status());
+    }
     Ok(())
 }
